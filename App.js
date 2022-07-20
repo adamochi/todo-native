@@ -1,3 +1,4 @@
+import CheckBoxParty from "./Checkbox";
 import { StatusBar } from "expo-status-bar";
 import { useState, useEffect } from "react";
 // import * as React from "react";
@@ -10,6 +11,7 @@ import {
   Dimensions,
   ScrollView,
   Alert,
+  // Image,
   // TouchableHighlight,
   // TouchableWithoutFeedback,
   // Pressable,
@@ -50,9 +52,6 @@ export default function App() {
     const saved = await AsyncStorage.getItem(STORAGE_KEY);
     setToDos(JSON.parse(saved));
   };
-  useEffect(() => {
-    loadToDos();
-  }, []);
 
   const addTodo = () => {
     if (todoInputText === "") {
@@ -122,10 +121,12 @@ export default function App() {
         placeholder={working ? "make a to do" : "where would you like to go?"}
         style={styles.input}
       />
+
       <ScrollView>
         {Object.keys(toDos).map((key) =>
           toDos[key].working === working ? (
             <View style={styles.toDo} key={key}>
+              <CheckBoxParty />
               <Text style={styles.toDoText}>{toDos[key].todoInputText}</Text>
               <TouchableOpacity onPress={() => deleteToDo(key)}>
                 <MaterialCommunityIcons
@@ -138,6 +139,12 @@ export default function App() {
           ) : null
         )}
       </ScrollView>
+      {/* <Image
+        style={styles.imagetop}
+        source={{
+          uri: "https://images.unsplash.com/photo-1460794418188-1bb7dba2720d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80",
+        }}
+      /> */}
     </View>
   );
 }
@@ -152,6 +159,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     width: "100%",
     justifyContent: "space-between",
+  },
+  imagetop: {
+    width: SCREEN_WIDTH,
+    height: "40%",
   },
   btnText: {
     fontWeight: "700",
