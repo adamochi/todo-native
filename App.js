@@ -1,6 +1,7 @@
-import CheckBoxParty from "./Checkbox";
+// import CheckBoxParty from "./Checkbox";
+
 import { StatusBar } from "expo-status-bar";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 // import * as React from "react";
 import {
   StyleSheet,
@@ -16,6 +17,7 @@ import {
   // TouchableWithoutFeedback,
   // Pressable,
 } from "react-native";
+import Checkbox from "expo-checkbox";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { theme } from "./colours";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -33,14 +35,17 @@ export default function App() {
   //   Whisper: require("./assets/fonts/Whisper.ttf"),
   //   Montserrat: require("./assets/fonts/Montserrat.ttf"),
   // });
-  // const [isChecked, setChecked] = useState(false);
-
+  const [isChecked, setChecked] = useState(false);
+  const [completed, setCompleted] = useState(false);
   const [working, setWorking] = useState(true);
   const [todoInputText, setTodoInputText] = useState("");
   const [toDos, setToDos] = useState({});
   useEffect(() => {
     loadToDos();
   }, []);
+  const complete = () => {
+    setCompleted((current) => !current);
+  };
   const travel = () => setWorking(false);
   const work = () => setWorking(true);
   const onChangeText = (payload) => setTodoInputText(payload);
@@ -60,11 +65,12 @@ export default function App() {
     // save todo //  const newToDos = Object.assign({}, toDos, {
     const newToDos = {
       ...toDos,
-      [Date.now()]: { todoInputText, working },
+      [Date.now()]: { todoInputText, working, completed },
     };
     setToDos(newToDos);
     saveToDos(newToDos);
     setTodoInputText("");
+    console.log(newToDos);
   };
 
   // if (!loaded) {
@@ -126,8 +132,21 @@ export default function App() {
         {Object.keys(toDos).map((key) =>
           toDos[key].working === working ? (
             <View style={styles.toDo} key={key}>
-              <CheckBoxParty />
-              <Text style={styles.toDoText}>{toDos[key].todoInputText}</Text>
+              {/* <CheckBoxParty onComplete={() => complete(key)} /> */}
+              <Checkbox
+                style={styles.checkbox}
+                value={isChecked}
+                onValueChange={setChecked}
+                color={isChecked ? "#4630EB" : undefined}
+              />
+              <Text
+                style={{
+                  ...styles.toDoText,
+                  textDecorationLine: isChecked ? "line-through" : undefined,
+                }}
+              >
+                {toDos[key].todoInputText}
+              </Text>
               <TouchableOpacity onPress={() => deleteToDo(key)}>
                 <MaterialCommunityIcons
                   style={styles.deleteIcon}
@@ -191,6 +210,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+  },
+  checkbox: {
+    margin: 8,
   },
   toDoText: {
     color: "white",
