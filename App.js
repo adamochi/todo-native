@@ -1,4 +1,4 @@
-// import CheckBoxParty from "./Checkbox";
+import CheckBoxParty from "./Checkbox";
 
 import { StatusBar } from "expo-status-bar";
 import React, { useState, useEffect } from "react";
@@ -17,7 +17,6 @@ import {
   // TouchableWithoutFeedback,
   // Pressable,
 } from "react-native";
-import Checkbox from "expo-checkbox";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { theme } from "./colours";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -35,16 +34,18 @@ export default function App() {
   //   Whisper: require("./assets/fonts/Whisper.ttf"),
   //   Montserrat: require("./assets/fonts/Montserrat.ttf"),
   // });
-  const [isChecked, setChecked] = useState(false);
-  const [completed, setCompleted] = useState(false);
-  const [working, setWorking] = useState(true);
-  const [todoInputText, setTodoInputText] = useState("");
-  const [toDos, setToDos] = useState({});
   useEffect(() => {
     loadToDos();
   }, []);
-  const complete = () => {
-    setCompleted((current) => !current);
+
+  const [isChecked, setChecked] = useState(false);
+  // const [completed, setCompleted] = useState(false);
+  const [working, setWorking] = useState(true);
+  const [todoInputText, setTodoInputText] = useState("");
+  const [toDos, setToDos] = useState({});
+  const completion = () => {
+    setChecked((current) => !current);
+    console.log(isChecked);
   };
   const travel = () => setWorking(false);
   const work = () => setWorking(true);
@@ -55,7 +56,7 @@ export default function App() {
 
   const loadToDos = async () => {
     const saved = await AsyncStorage.getItem(STORAGE_KEY);
-    setToDos(JSON.parse(saved));
+    if (saved) setToDos(JSON.parse(saved));
   };
 
   const addTodo = () => {
@@ -65,7 +66,7 @@ export default function App() {
     // save todo //  const newToDos = Object.assign({}, toDos, {
     const newToDos = {
       ...toDos,
-      [Date.now()]: { todoInputText, working, completed },
+      [Date.now()]: { todoInputText, working, isChecked },
     };
     setToDos(newToDos);
     saveToDos(newToDos);
@@ -90,6 +91,14 @@ export default function App() {
         },
       },
     ]);
+  };
+  const completeMe = (key) => {
+    const newToDos = { ...toDos };
+    newToDos[key] = { isChecked: true };
+    setToDos(newToDos);
+    saveToDos(newToDos);
+    setChecked((current) => !current);
+    console.log(newToDos);
   };
 
   return (
@@ -132,17 +141,20 @@ export default function App() {
         {Object.keys(toDos).map((key) =>
           toDos[key].working === working ? (
             <View style={styles.toDo} key={key}>
-              {/* <CheckBoxParty onComplete={() => complete(key)} /> */}
-              <Checkbox
+              <CheckBoxParty completeMe={completeMe} />
+
+              {/* <Checkbox
                 style={styles.checkbox}
                 value={isChecked}
                 onValueChange={setChecked}
                 color={isChecked ? "#4630EB" : undefined}
-              />
+              /> */}
+
               <Text
                 style={{
                   ...styles.toDoText,
                   textDecorationLine: isChecked ? "line-through" : undefined,
+                  fontWeight: isChecked ? "bold" : undefined,
                 }}
               >
                 {toDos[key].todoInputText}

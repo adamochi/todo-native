@@ -8,6 +8,7 @@ export default function CheckBoxParty() {
   return (
     <View style={styles.section}>
       <Checkbox
+        name={"poop"}
         style={styles.checkbox}
         value={isChecked}
         onValueChange={setChecked}
